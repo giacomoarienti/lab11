@@ -6,7 +6,11 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.Toolkit;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -27,18 +31,46 @@ import javax.swing.JTextArea;
  *
  * 4) List all the words in alphabetical order
  * 
- * 5) Write the count for each word, e.g. "word word pippo" should output "pippo -> 1 word -> 2"
+ * 5) Write the count for each word, e.g. "word word pippo" should output "pippo
+ * -> 1 word -> 2"
  *
  */
 public final class LambdaFilter extends JFrame {
 
     private static final long serialVersionUID = 1760990730218643730L;
 
+    private static final String NEW_LINE = "\n";
+    private static final String WORD_SEPARATOR = " ";
+
     private enum Command {
         /**
          * Commands.
          */
-        IDENTITY("No modifications", Function.identity());
+        IDENTITY("No modifications", Function.identity()),
+        LOWERCASE("Convert to lowercase", (final String s) -> s.toLowerCase()),
+        COUNT("Count the number chars", (final String s) -> String.valueOf(s.length())),
+        LINES("Count the number of lines", (final String s) -> String.valueOf(
+                List.of(s.split(NEW_LINE)).stream().count())),
+        ORDEREDWORDS(
+            "List all the words in alphabetical order",
+            (final String s) ->
+                Arrays.stream(s.split(WORD_SEPARATOR))
+                    .sorted()
+                    .collect(Collectors.joining(WORD_SEPARATOR))
+        ),
+        COUNTWORDS(
+            "Write the count for each word",
+            (final String s) ->
+                Arrays.stream(s.split(WORD_SEPARATOR))
+                    .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                    .entrySet().stream()
+                        .map((Entry<String, Long> entry) -> 
+                            entry.getKey() + " -> " + entry.getValue()
+                        )
+                        .map(String::valueOf)
+                        .collect(Collectors.joining(WORD_SEPARATOR))
+        ),
+        ;
 
         private final String commandName;
         private final Function<String, String> fun;
