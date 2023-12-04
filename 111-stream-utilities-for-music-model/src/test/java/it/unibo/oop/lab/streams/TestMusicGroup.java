@@ -117,6 +117,14 @@ final class TestMusicGroup {
     }
 
     /**
+     * Tests average duration.
+     */
+    @Test
+    void testLongestSong() {
+        assertEquals("When the Levee Breaks", lz.longestSong().get());
+    }
+
+    /**
      * Tests selecting the longest song.
      */
     @Test
